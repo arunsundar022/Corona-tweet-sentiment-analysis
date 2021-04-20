@@ -1,8 +1,9 @@
-from pandas import HDFStore
+import tensorflow as tf
+from tensorflow import keras
 from flask import Flask,request,render_template
 
 #Load Model
-model = HDFStore('LSTM Classifier.h5')
+model = tf.keras.models.load_model('model.h5')
 
 #create application
 app = Flask(__name__)
@@ -15,21 +16,22 @@ def home():
 #Predict Function
 @app.route('/',methods=['POST'])
 def predict():
-    text = request.form.__str__()
-    prediction = model.predict(text)
+    if request.method == "POST":
+        text = request.form.get("tex")
+        prediction = model.predict(text)
 
-    sentiment = prediction
+        sentiment = prediction
 
-    if sentiment == 0:
-        return render_template('form.html',
-        result = "Neutral")
-    elif sentiment == 1:
-        return render_template('form.html',
-        result = "Positive")
-    else:
-        return render_template('form.html',
-        result = "Negative")
+        if sentiment == 0:
+            return render_template('form.html',
+            result = "Neutral")
+        elif sentiment == 1:
+            return render_template('form.html',
+            result = "Positive")
+        else:
+            return render_template('form.html',
+            result = "Negative")
 
 #Run Application
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
