@@ -1,4 +1,6 @@
+import numpy as np
 import tensorflow as tf
+from nlp import nlp_ready
 from tensorflow import keras
 from flask import Flask,request,render_template
 
@@ -18,18 +20,20 @@ def home():
 def predict():
     if request.method == "POST":
         text = request.form.get("tex")
-        prediction = model.predict(text)
+        text = nlp_ready(text)
+        prediction = np.argmax(model.predict_classes(text))
+        print(prediction)
 
         sentiment = prediction
 
         if sentiment == 0:
-            return render_template('form.html',
+            return render_template('prediction.html',
             result = "Neutral")
         elif sentiment == 1:
-            return render_template('form.html',
+            return render_template('prediction.html',
             result = "Positive")
         else:
-            return render_template('form.html',
+            return render_template('prediction.html',
             result = "Negative")
 
 #Run Application
